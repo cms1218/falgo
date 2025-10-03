@@ -1,16 +1,19 @@
 import pandas as pd
 import features
+from dotenv import load_dotenv
 import os
 import psycopg2
 
-# initialize connection for all functions
+load_dotenv()  # loads .env
+
 conn = psycopg2.connect(
-        dbname="falgo",
-        user="postgres", 
-        password="121805++", 
-        host = 'localhost',
-        port=5432
-    )
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT")
+)
+
 
 # create ohlcv table
 def createTable():
