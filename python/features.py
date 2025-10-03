@@ -1,21 +1,22 @@
 import pandas as pd
 import os
 
-filename = 'AAPL.csv'
-data = pd.read_csv(os.path.join('data', filename))
-
 # Generate Simple moving average column
 def SMA(df : pd.DataFrame, length=20):
-    df[("SMA" + str(length))] = df['Close'].rolling(length).mean()
+    df[("sma" + str(length))] = pd.to_numeric(df['Close'].rolling(length).mean())
+    return df
 
 # Generate Returns column
 def pctChange(df : pd.DataFrame):
-    df['Returns'] = df['Close'].pct_change()
+    df['pctchange'] = pd.to_numeric(df['Close'].pct_change())
+    return df
 
 # Generate Exponential Moving Average column
 def EMA(df : pd.DataFrame, length=21):
-    df[("EMA" + str(length))] = df['Close'].ewm(span=length, adjust=False).mean()
+    df[("ema" + str(length))] = pd.to_numeric(df['Close'].ewm(span=length, adjust=False).mean())
+    return df
 
 # Generate volatility column
 def volatility(df : pd.DataFrame, length=10):
-    df[('Volatility')] = df['Returns'].rolling(length).std()
+    df[('volatility')] = pd.to_numeric(df['pctchange'].rolling(length).std())
+    return df
