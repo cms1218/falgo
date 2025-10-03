@@ -8,7 +8,7 @@ def SMA(df : pd.DataFrame, length=20):
 
 # Generate Returns column
 def pctChange(df : pd.DataFrame):
-    df['pctchange'] = pd.to_numeric(df['Close'].pct_change())
+    df['pctchange'] = pd.to_numeric(df['Close'].pct_change()*100)
     return df
 
 # Generate Exponential Moving Average column

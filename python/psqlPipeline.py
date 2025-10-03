@@ -18,7 +18,7 @@ def createTable():
 
     #create table for specific ticker in psql database
     create = f"""
-    CREATE TABLE IF NOT EXISTS ohlcv_data (
+    CREATE TABLE IF NOT EXISTS ohlcv (
         symbol VARCHAR(10),
         ts DATE,
         open NUMERIC(10, 2),
@@ -26,13 +26,6 @@ def createTable():
         low NUMERIC(10, 2),
         close NUMERIC(10, 2),
         volume NUMERIC(12),
-        sma20 NUMERIC(10,2),
-        sma50 NUMERIC(10,2),
-        sma100 NUMERIC(10,2),
-        ema9 NUMERIC(10,2),
-        ema21 NUMERIC(10,2),
-        pctchange NUMERIC(10, 2),
-        volatility NUMERIC(10, 2),
         UNIQUE(symbol, ts)
     );
     """
@@ -66,15 +59,6 @@ def clean_csv(csv_path : str, symbol: str) -> pd.DataFrame:
     df['Open'] = pd.to_numeric(df['Open'])
     df['Volume'] = pd.to_numeric(df['Volume'])
 
-    # Add new columns to the dataframe of popular financial indicators
-    df = features.SMA(df, 20)
-    df = features.SMA(df, 50)
-    df = features.SMA(df, 100)
-    df = features.EMA(df, 9)
-    df = features.EMA(df, 21)
-    df = features.pctChange(df)
-    df = features.volatility(df, 10)
-
     return df
 
 # insert dataframe into postgres database
@@ -83,18 +67,15 @@ def insert_into_db(df):
 
     rows = [
         (row['symbol'], row['Date'], row['Open'], row['High'],
-         row['Low'], row['Close'], row['Volume'], row['sma20'],
-         row['sma50'], row['sma100'], row['ema9'], row['ema21'],
-         row['pctchange'], row['volatility'])
+         row['Low'], row['Close'], row['Volume'])
          for _, row in df.iterrows()
     ]
 
     insert = f"""
-    INSERT INTO ohlcv_data (
-        symbol, ts, open, high, low, close, volume, 
-        sma20, sma50, sma100, ema9, ema21, pctchange, volatility
+    INSERT INTO ohlcv (
+        symbol, ts, open, high, low, close, volume
     )
-    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    VALUES(%s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (symbol, ts) DO NOTHING;
     """
 
