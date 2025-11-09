@@ -19,7 +19,7 @@ conn = psycopg2.connect(
 def createTable():
     cur = conn.cursor()
 
-    #create table for specific ticker in psql database
+    #create table if it doesn't exist in local db
     create = f"""
     CREATE TABLE IF NOT EXISTS ohlcv (
         symbol VARCHAR(10),
@@ -37,7 +37,7 @@ def createTable():
     conn.commit()
     cur.close()
 
-# function to clean up the csv
+#cleans up csv before insertion into db
 def clean_csv(csv_path : str, symbol: str) -> pd.DataFrame:
     # Pull in csv
     df = pd.read_csv(csv_path)
